@@ -54,10 +54,17 @@ where
             },
         );
         group.bench_with_input(
-            BenchmarkId::new("speedy", benchmark_param_display),
+            BenchmarkId::new("speedy", benchmark_param_display.clone()),
             obj,
             |b, d| {
                 b.iter(|| d.write_to_vec(Endianness::LittleEndian).unwrap());
+            },
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bcs", benchmark_param_display),
+            obj,
+            |b, d| {
+                b.iter(|| bcs::to_bytes(d).unwrap());
             },
         );
     }
@@ -127,10 +134,17 @@ where
             },
         );
         group.bench_with_input(
-            BenchmarkId::new("speedy", benchmark_param_display),
+            BenchmarkId::new("speedy", benchmark_param_display.clone()),
             speedy_data,
             |b, d| {
                 b.iter(|| T::read_from_buffer(Endianness::LittleEndian, d).unwrap());
+            },
+        );
+        group.bench_with_input(
+            BenchmarkId::new("bcs", benchmark_param_display),
+            speedy_data,
+            |b, d| {
+                b.iter(|| bcs::from_bytes::<T>(d).unwrap());
             },
         );
     }
